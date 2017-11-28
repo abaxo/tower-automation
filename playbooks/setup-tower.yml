@@ -1,0 +1,30 @@
+---
+# Install tower and run bootstrap on all the servers
+- hosts: towers
+  name: Install and bootstrap both towers
+  roles: 
+  - install-tower
+  environment:
+    https_proxy: http://proxy01.example.com:3128
+    no_proxy: localhost
+    
+# Check if the Primary server is up
+- hosts: towers
+  gather_facts: false
+  pre_tasks:
+  - name: Check if the Primary server is up
+    ignore_errors: yes
+    register: primary_status
+    run_once: true
+    uri:
+      url: "https://{{ groups['towers-pri'][0] }}/api/"
+      validate_certs: false
+      status_code: 200
+    delegate_to: localhost
+  roles:
+    - { role: install-workpacks, when: "primary_status.status_code == '200' and inventory_hostname in groups['towers-pri']" }
+    - { role: clean-tower, when: "primary_status.status_code != '200' and inventory_hostname in groups['towers-sec'] " }
+    - { role: install-workpacks, when: "primary_status.status_code != '200' and inventory_hostname in groups['towers-sec'] " }
+  environment:
+    https_proxy: http://proxy01.example.com:3128
+    no_proxy: localhost, .example.com

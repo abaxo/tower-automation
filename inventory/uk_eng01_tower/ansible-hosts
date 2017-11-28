@@ -1,0 +1,8 @@
+[towers]
+tower01.example.com
+
+[towers-pri]
+tower01.example.com
+
+[towers-sec]
+tower02.example.com
