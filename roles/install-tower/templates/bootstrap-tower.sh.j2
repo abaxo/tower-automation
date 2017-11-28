@@ -88,7 +88,7 @@ ${TOWER_CLI} role grant --type "{{ grant_type }}" --team "{{ team }}"   --projec
 
 
 # TODO find a way of parametrising this
-AWX_DIRECTORY=$( ${TOWER_CLI} project get -n "OSE Consolidated"  -f yaml | awk '/local_path/{ print $2; }' )
+AWX_DIRECTORY=$( ${TOWER_CLI} project get -n "Openshift Automation"  -f yaml | awk '/local_path/{ print $2; }' )
 
 PROJECT_DIRECTORY="/var/lib/awx/projects/${AWX_DIRECTORY}"
 ###
@@ -99,7 +99,7 @@ PROJECT_DIRECTORY="/var/lib/awx/projects/${AWX_DIRECTORY}"
 ############################################
 
 # Get Project ID
-PROJECT_ID=`${TOWER_CLI} project list | grep 'OSE Consolidated' | awk '{ print $1; }'`
+PROJECT_ID=`${TOWER_CLI} project list | grep 'Openshift Automation' | awk '{ print $1; }'`
 
 # Refresh the project by ID
 ${TOWER_CLI} project update ${PROJECT_ID} --wait
@@ -114,8 +114,8 @@ ${TOWER_CLI} project update ${PROJECT_ID} --wait
 {% for inventory in inventories %}
 INVENTORY_ID=`${TOWER_CLI} inventory create -n "{{ inventory }}"  --organization "${ORGANIZATION}" |  grep  '{{ inventory }}' | awk '{print $1; }'`
 
-${TOWER_CLI} role grant --team "Paas" --inventory "{{ inventory }}" --type read
-${TOWER_CLI} role grant --team "Paas" --inventory "{{ inventory }}" --type use 
+${TOWER_CLI} role grant --team "Engineering" --inventory "{{ inventory }}" --type read
+${TOWER_CLI} role grant --team "Engineering" --inventory "{{ inventory }}" --type use 
 
 /usr/bin/tower-manage inventory_import --inventory-name "{{ inventory }}"  --source="${PROJECT_DIRECTORY}/inventories/{{ inventory }}/" --overwrite --overwrite-vars -v 3
 
